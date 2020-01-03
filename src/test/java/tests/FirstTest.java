@@ -2,8 +2,11 @@ package tests;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
+import io.appium.java_client.TouchAction;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -16,13 +19,14 @@ import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 
 public class FirstTest {
 
     private AppiumDriver<MobileElement> driver;
-    private final String email = "testemail@test.ru";
-    private final String password = "!pas@w0rD";
+    private final String EMAIL = "testemail@test.ru";
+    private final String PASSWORD = "!pas@w0rD";
 
     @BeforeTest
     public void setUp() throws MalformedURLException {
@@ -41,7 +45,7 @@ public class FirstTest {
 
     }
 
-    @Test
+    @Test(priority = 1)
     public void firstTest() throws InterruptedException {
         WebElement loginMenu = waitElementPresent("//*[@text = 'Login']", 10);
         loginMenu.click();
@@ -49,13 +53,13 @@ public class FirstTest {
         signUpSection.click();
         WebElement emailField = driver.findElementByXPath("//*[@text = 'Email']");
         emailField.click();
-        emailField.sendKeys(email);
+        emailField.sendKeys(EMAIL);
         WebElement passwordField = driver.findElementByXPath("//*[@text = 'Password']");
         passwordField.click();
-        passwordField.sendKeys(password);
+        passwordField.sendKeys(PASSWORD);
         WebElement passwordConfirmField = driver.findElementByXPath("//*[@text = 'Confirm password']");
         passwordConfirmField.click();
-        passwordConfirmField.sendKeys(password);
+        passwordConfirmField.sendKeys(PASSWORD);
         driver.hideKeyboard();
         WebElement loginButton = driver.findElementByXPath("//*[@text = 'SIGN UP']");
         loginButton.click();
@@ -72,12 +76,12 @@ public class FirstTest {
         }
     }
 
-    @Test
+    @Test(priority = 2)
     public void secondTest() throws InterruptedException {
         WebElement loginSection = driver.findElementByXPath("//*[@text = 'Login']");
         loginSection.click();
         WebElement emailField = driver.findElementByXPath("//*[@content-desc = 'input-email']");
-        Assert.assertEquals(emailField.getText(), email);
+        Assert.assertEquals(emailField.getText(), EMAIL);
         WebElement passwordField = driver.findElementByXPath("//*[@content-desc = 'input-password']");
         Assert.assertNotNull(passwordField.getText());
         WebElement loginButton = driver.findElementByXPath("//*[@content-desc = 'button-LOGIN']");
@@ -95,14 +99,14 @@ public class FirstTest {
         }
     }
 
-    @Test
+    @Test (priority = 3)
     public void thirdTest() throws InterruptedException {
         WebElement emailField = driver.findElementByXPath("//*[@content-desc = 'input-email']");
         emailField.clear();
-        emailField.sendKeys(email);
+        emailField.sendKeys(EMAIL);
         WebElement passwordField = driver.findElementByXPath("//*[@content-desc = 'input-password']");
         passwordField.clear();
-        passwordField.sendKeys(password);
+        passwordField.sendKeys(PASSWORD);
         WebElement loginButton = driver.findElementByXPath("//*[@content-desc = 'button-LOGIN']");
         loginButton.click();
         WebElement alertTitle = waitElementPresent(By.id("android:id/alertTitle"), 10);
@@ -115,6 +119,27 @@ public class FirstTest {
         List<MobileElement> alertHiden = driver.findElementsByXPath("//*[@content-desc = 'input-email']");
         if (alertHiden.size() == 0){
             Assert.fail("Successfull alert not hiden");
+        }
+    }
+
+    @Test (priority = 4)
+    public void fourthTest() {
+        WebElement swipeSection = driver.findElementByXPath("//*[@content-desc = 'Swipe']");
+        swipeSection.click();
+        TouchAction action = new TouchAction(driver);
+        WebElement swipeElement = waitElementPresent("//*[@content-desc = 'card']", 5);
+        int l_x = swipeElement.getLocation().getX();
+        int u_y = swipeElement.getLocation().getY();
+        int r_x = l_x + swipeElement.getSize().getWidth();
+        int l_y = u_y + swipeElement.getSize().getHeight();
+        int m_y = (u_y + l_y)/2;
+        while(driver.findElementsByXPath("//*[@text = 'EXTENDABLE']").size() == 0) {
+            action
+                    .press(PointOption.point(r_x, m_y))
+                    .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
+                    .moveTo(PointOption.point(l_x, m_y))
+                    .release()
+                    .perform();
         }
     }
 
